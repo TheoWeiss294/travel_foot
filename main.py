@@ -29,7 +29,7 @@ def main():
     ]
     graph = travel.TravelGraph(matches, max_dist=50, max_days=4)
     paths = graph.find_paths(min_games=2)
-    print(paths)
+    print("\n".join(paths))
 
 
 if __name__ == "__main__":
