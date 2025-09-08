@@ -29,7 +29,7 @@ if CACHE_FILE.exists():
 def save_cache() -> None:
     CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(CACHE_FILE, "w", encoding="utf-8") as cf:
-        json.dump(_cache, cf, indent=2, sort_keys=True)
+        json.dump(_cache, cf, indent=2, sort_keys=True, ensure_ascii=False)
 
 
 def geocode_with_cache(query: str) -> Location | None:
