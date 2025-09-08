@@ -104,26 +104,6 @@ class TravelGraph:
                     output=output,
                 )
 
-        # for next_match, days_between in self.graph[last_match].items():
-        #     if days_between <= days_left:
-        #         found_better = True
-        #         self.find_path_with_candidate(
-        #             candidate + [next_match],
-        #             min_games,
-        #             days_left - days_between,
-        #             output,
-        #         )
-        #     elif len(candidate) > 1:
-        #         first = candidate[0]
-        #         second = candidate[1]
-        #         skip_days = (self.matches[second].date - self.matches[first].date).days
-        #         self.find_path_with_candidate(
-        #             candidate[1:] + [next_match],
-        #             min_games,
-        #             days_left + skip_days,
-        #             output,
-        #         )
-
         if success and not found_better:
             output.append(candidate)
         return success or found_better
