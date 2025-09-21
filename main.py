@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from venues import geocode_with_cache
 from connectors import football_data
@@ -9,9 +9,10 @@ from travel import travel
 TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def run(min_games: int, max_days: int, max_dist: float) -> None:
+def run(min_games: int, max_days: int, max_dist: float, days_ahead: int) -> None:
+    today = datetime.now(timezone.utc)
     fixtures = football_data.get_champions_league_fixtures(
-        datetime(2025, 9, 21), datetime(2025, 10, 21)
+        today, today + timedelta(days=days_ahead)
     )
     data = football_data.get_competition_teams(football_data.LeagueId.CHAMPIONS_LEAGUE)
     home_grounds = {
@@ -51,9 +52,20 @@ def main():
         default=50.0,
         help="Maximum distance (km) between venues",
     )
+    parser.add_argument(
+        "--days-ahead",
+        type=int,
+        default=30,
+        help="Number of days to look ahead for fixtures",
+    )
 
     args = parser.parse_args()
-    run(min_games=args.min_games, max_days=args.max_days, max_dist=args.max_dist)
+    run(
+        min_games=args.min_games,
+        max_days=args.max_days,
+        max_dist=args.max_dist,
+        days_ahead=args.days_ahead,
+    )
 
 
 if __name__ == "__main__":
