@@ -1,3 +1,4 @@
+import argparse
 from datetime import datetime, timezone
 
 from venues import geocode_with_cache
@@ -8,14 +9,15 @@ from travel import travel
 TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
-def main():
+def run(min_games: int, max_days: int, max_dist: float) -> None:
     fixtures = football_data.get_champions_league_fixtures(
-        datetime(2025, 9, 1), datetime(2025, 10, 1)
+        datetime(2025, 9, 21), datetime(2025, 10, 21)
     )
     data = football_data.get_competition_teams(football_data.LeagueId.CHAMPIONS_LEAGUE)
     home_grounds = {
         team["name"]: team["venue"] for team in data["teams"] if team["venue"]
     }
+
     matches = [
         travel.Match(
             f["homeTeam"]["name"],
@@ -27,9 +29,31 @@ def main():
         if (venue := f.get("venue", home_grounds.get(f["homeTeam"]["name"])))
         and (location := geocode_with_cache(venue))
     ]
-    graph = travel.TravelGraph(matches, max_dist=50, max_days=4)
-    paths = graph.find_paths(min_games=2)
+
+    graph = travel.TravelGraph(matches, max_dist=max_dist, max_days=max_days)
+    paths = graph.find_paths(min_games=min_games)
     print(paths)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Find relative sports events in time and space"
+    )
+    parser.add_argument(
+        "--min-games", type=int, default=2, help="Minimum number of games in a path"
+    )
+    parser.add_argument(
+        "--max-days", type=int, default=4, help="Maximum days between games"
+    )
+    parser.add_argument(
+        "--max-dist",
+        type=float,
+        default=50.0,
+        help="Maximum distance (km) between venues",
+    )
+
+    args = parser.parse_args()
+    run(min_games=args.min_games, max_days=args.max_days, max_dist=args.max_dist)
 
 
 if __name__ == "__main__":
