@@ -9,6 +9,9 @@ class Match(NamedTuple):
     date: datetime
     location: Location
 
+    def __repr__(self) -> str:
+        return f"{self.home_team} vs {self.away_team}"
+
 
 class Gameday(NamedTuple):
     date: datetime
@@ -122,6 +125,6 @@ class TravelGraph:
         for option_idx, schedule in enumerate(schedule_options, start=1):
             lines.append(f"Option {option_idx}:")
             for gd in schedule:
-                match_ids = ", ".join(str(self.matches[m]) for m in gd.matches)
-                lines.append(f"  {gd.date.strftime('%Y-%m-%d')}: Matches [{match_ids}]")
+                matches = " | ".join(str(self.matches[m]) for m in gd.matches)
+                lines.append(f"  {gd.date.strftime('%Y-%m-%d')}: [{matches}]")
         return "\n".join(lines)
