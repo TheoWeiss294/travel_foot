@@ -2,18 +2,13 @@ import json
 import time
 import math
 from pathlib import Path
-from typing import NamedTuple
 
 from connectors import open_street_map
+from data_classes import Location
 
 # Locate project root (TRAVEL_FOOT) from this file’s location
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CACHE_FILE = PROJECT_ROOT / "venues" / "venues.json"
-
-
-class Location(NamedTuple):
-    latitude: float
-    longitude: float
 
 
 _cache: dict[str, tuple[float, float]] = {}

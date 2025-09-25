@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from travel import travel
-from venues import Location
+from data_classes import Location
 
 
 MATCHES_EXAMPLE = [
