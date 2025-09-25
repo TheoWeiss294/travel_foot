@@ -1,21 +1,5 @@
-from typing import NamedTuple
-from datetime import datetime
-from venues import Location, haversine_distance
-
-
-class Match(NamedTuple):
-    home_team: str
-    away_team: str
-    date: datetime
-    location: Location
-
-    def __repr__(self) -> str:
-        return f"{self.home_team} vs {self.away_team}"
-
-
-class Gameday(NamedTuple):
-    date: datetime
-    matches: set[int]
+from venues import haversine_distance
+from data_classes import Match, Gameday
 
 
 class TravelGraph:

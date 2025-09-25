@@ -1,1 +1,1 @@
-from .venues import Location, geocode_with_cache, haversine_distance
+from .venues import geocode_with_cache, haversine_distance

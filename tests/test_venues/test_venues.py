@@ -3,7 +3,6 @@
 import json
 from unittest.mock import patch, MagicMock
 from venues import venues
-from venues.venues import Location
 
 
 def test_geocode_with_cache__in_cache(monkeypatch):
@@ -15,7 +14,7 @@ def test_geocode_with_cache__in_cache(monkeypatch):
 
     coords = venues.geocode_with_cache("Allianz Arena")
 
-    assert coords == Location(48.2188, 11.6236)
+    assert coords == venues.Location(48.2188, 11.6236)
 
 
 def test_geocode_with_cache__not_in_cache():
@@ -27,7 +26,7 @@ def test_geocode_with_cache__not_in_cache():
     ):
         coords = venues.geocode_with_cache("Some Stadium")
 
-    assert coords == Location(40.1235, 20.6543)
+    assert coords == venues.Location(40.1235, 20.6543)
     assert venues._cache["Some Stadium"] == (40.1235, 20.6543)
 
 
@@ -42,7 +41,7 @@ def test_save_cache_does_not_touch_file(tmp_path, monkeypatch):
 
 
 def test_haversine_distance__sanity() -> None:
-    allianz = Location(48.2188, 11.6236)
-    signal_iduna = Location(51.4925, 7.4517)
+    allianz = venues.Location(48.2188, 11.6236)
+    signal_iduna = venues.Location(51.4925, 7.4517)
     distance_km = venues.haversine_distance(allianz, signal_iduna)
     assert round(distance_km, 3) == 470.965
