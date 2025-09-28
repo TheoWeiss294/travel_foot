@@ -2,6 +2,10 @@ from typing import NamedTuple
 from datetime import datetime
 
 
+WeightedNeighbourDict = dict[int, int]
+MatchGraph = list[WeightedNeighbourDict]
+
+
 class Location(NamedTuple):
     latitude: float
     longitude: float
