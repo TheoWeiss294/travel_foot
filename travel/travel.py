@@ -102,7 +102,7 @@ class TravelGraph:
             matchdays_dict[date].add(match_index)
         return [Matchday(date, matches) for date, matches in matchdays_dict.items()]
 
-    def format_paths(self, schedule_options: list[list[Matchday]]) -> str:
+    def format_paths(self, schedule_options: list[MatchPath]) -> str:
         lines = []
         for option_idx, schedule in enumerate(schedule_options, start=1):
             lines.append(f"Option {option_idx}:")
