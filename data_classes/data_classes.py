@@ -21,6 +21,9 @@ class Match(NamedTuple):
         return f"{self.home_team} vs {self.away_team}"
 
 
-class Gameday(NamedTuple):
+class Matchday(NamedTuple):
     date: datetime
     matches: set[int]
+
+
+MatchPath = list[Matchday]
