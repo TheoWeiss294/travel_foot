@@ -1,12 +1,7 @@
 import argparse
 from datetime import datetime, timezone, timedelta
 
-from venues import geocode_with_cache
-from connectors import football_data
 from travel import match, travel
-
-
-TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 def run(min_games: int, max_days: int, max_dist: float, days_ahead: int) -> None:
