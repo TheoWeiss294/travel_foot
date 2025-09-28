@@ -12,6 +12,7 @@ BASE_URL = "https://api.football-data.org/v4"
 
 class LeagueId(StrEnum):
     CHAMPIONS_LEAGUE = "CL"
+    PREMIER_LEAGUE = "PL"
 
 
 class FixturesParams(NamedTuple):
