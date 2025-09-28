@@ -60,8 +60,8 @@ class TravelGraph:
                     candidate + [next_match], min_games, days_left - days, output
                 )
             else:
-                first, second = candidate[:2]
-                removed = (self.matches[second].date - self.matches[first].date).days
+                first, second = [self.matches[m] for m in candidate[:2]]
+                removed = (second.date - first.date).days
                 self.find_path_with_candidate(
                     candidate[1:], min_games, days_left + removed, output
                 )
