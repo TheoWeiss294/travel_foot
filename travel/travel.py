@@ -1,5 +1,5 @@
 from venues import haversine_distance
-from data_classes import Match, Gameday, MatchGraph
+from data_classes import Match, Matchday, MatchPath, MatchGraph
 from .utils import calc_incoming_degrees
 
 
@@ -30,13 +30,13 @@ class TravelGraph:
         ]
 
     def find_paths(self, min_games: int) -> str:
-        paths: list[list[Gameday]] = []
+        paths: list[MatchPath] = []
         incoming_degrees = calc_incoming_degrees(self.graph)
         root_matches = [i for i in range(len(self.matches)) if incoming_degrees[i] == 0]
 
         for match_index in root_matches:
             self.find_path_with_candidate(
-                [Gameday(self.matches[match_index].date, set([match_index]))],
+                [Matchday(self.matches[match_index].date, set([match_index]))],
                 min_games,
                 self.total_days - 1,
                 paths,
@@ -47,19 +47,19 @@ class TravelGraph:
 
     def find_path_with_candidate(
         self,
-        candidate: list[Gameday],
+        candidate: MatchPath,
         min_games: int,
         days_left: int,
-        output: list[list[Gameday]],
+        output: list[MatchPath],
     ) -> bool:
         if not candidate:
             return False
-        last_gameday = candidate[-1]
+        last_matchday = candidate[-1]
         success = len(candidate) >= min_games
         found_better = False
 
-        matches = last_gameday.matches
-        date = last_gameday.date
+        matches = last_matchday.matches
+        date = last_matchday.date
         first_hops = set(n for match in matches for n in self.graph[match].keys())
         second_hops = set(n for hop in first_hops for n in self.graph[hop].keys())
         candidates = [first_hops] if first_hops else []
@@ -67,25 +67,25 @@ class TravelGraph:
             if (self.matches[second].date - date).days > days_left:
                 continue
             new_candidates: list[set[int]] = []
-            for gameday in candidates:
-                if second in gameday:
-                    gameday.remove(second)
+            for matchday in candidates:
+                if second in matchday:
+                    matchday.remove(second)
                 if valid_stops := set(
-                    match for match in gameday if second in self.graph[match]
+                    match for match in matchday if second in self.graph[match]
                 ):
                     new_candidates.append(valid_stops)
-                if remaining := gameday - valid_stops:
+                if remaining := matchday - valid_stops:
                     new_candidates.append(remaining)
             candidates = new_candidates
 
         for next_matches in candidates:
             found_better = True
-            gamedays = self._group_by_days(next_matches)
-            for gameday in gamedays:
+            matchdays = self._group_by_days(next_matches)
+            for matchday in matchdays:
                 self.find_path_with_candidate(
-                    candidate + [gameday],
+                    candidate + [matchday],
                     min_games,
-                    days_left=days_left - (gameday.date - date).days,
+                    days_left=days_left - (matchday.date - date).days,
                     output=output,
                 )
 
@@ -93,16 +93,16 @@ class TravelGraph:
             output.append(candidate)
         return success or found_better
 
-    def _group_by_days(self, matches: set[int]) -> list[Gameday]:
-        gamedays_dict = {}
+    def _group_by_days(self, matches: set[int]) -> list[Matchday]:
+        matchdays_dict = {}
         for match_index in matches:
             date = self.matches[match_index].date
-            if date not in gamedays_dict:
-                gamedays_dict[date] = set()
-            gamedays_dict[date].add(match_index)
-        return [Gameday(date, matches) for date, matches in gamedays_dict.items()]
+            if date not in matchdays_dict:
+                matchdays_dict[date] = set()
+            matchdays_dict[date].add(match_index)
+        return [Matchday(date, matches) for date, matches in matchdays_dict.items()]
 
-    def format_paths(self, schedule_options: list[list[Gameday]]) -> str:
+    def format_paths(self, schedule_options: list[MatchPath]) -> str:
         lines = []
         for option_idx, schedule in enumerate(schedule_options, start=1):
             lines.append(f"Option {option_idx}:")
