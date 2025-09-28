@@ -17,10 +17,10 @@ def main():
         description="Find relative sports events in time and space"
     )
     parser.add_argument(
-        "--min-games", type=int, default=2, help="Minimum number of games in a path"
+        "--min-games", type=int, default=3, help="Minimum number of games in a path"
     )
     parser.add_argument(
-        "--max-days", type=int, default=4, help="Maximum days between games"
+        "--max-days", type=int, default=5, help="Maximum days between games"
     )
     parser.add_argument(
         "--max-dist",
