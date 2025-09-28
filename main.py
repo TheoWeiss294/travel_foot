@@ -9,7 +9,7 @@ def run(min_games: int, max_days: int, max_dist: float, days_ahead: int) -> None
     matches = match.get_all_matches(today, today + timedelta(days=days_ahead))
     graph = travel.TravelGraph(matches, max_dist=max_dist, max_days=max_days)
     paths = graph.find_paths(min_games=min_games)
-    print(paths)
+    print(graph.format_paths(paths))
 
 
 def main():
