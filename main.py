@@ -1,36 +1,12 @@
 import argparse
 from datetime import datetime, timezone, timedelta
 
-from venues import geocode_with_cache
-from connectors import football_data
-from travel import travel
-
-
-TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+from travel import match, travel
 
 
 def run(min_games: int, max_days: int, max_dist: float, days_ahead: int) -> None:
     today = datetime.now(timezone.utc)
-    fixtures = football_data.get_champions_league_fixtures(
-        today, today + timedelta(days=days_ahead)
-    )
-    data = football_data.get_competition_teams(football_data.LeagueId.CHAMPIONS_LEAGUE)
-    home_grounds = {
-        team["name"]: team["venue"] for team in data["teams"] if team["venue"]
-    }
-
-    matches = [
-        travel.Match(
-            f["homeTeam"]["name"],
-            f["awayTeam"]["name"],
-            datetime.strptime(f["utcDate"], TIME_FORMAT).replace(tzinfo=timezone.utc),
-            location,
-        )
-        for f in fixtures["matches"]
-        if (venue := f.get("venue", home_grounds.get(f["homeTeam"]["name"])))
-        and (location := geocode_with_cache(venue))
-    ]
-
+    matches = match.get_all_matches(today, today + timedelta(days=days_ahead))
     graph = travel.TravelGraph(matches, max_dist=max_dist, max_days=max_days)
     paths = graph.find_paths(min_games=min_games)
     print(paths)
