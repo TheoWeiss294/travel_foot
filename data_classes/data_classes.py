@@ -23,7 +23,7 @@ class Match(NamedTuple):
 
 class Matchday(NamedTuple):
     date: datetime
-    matches: set[int]
+    matches: set[Match]
 
 
 MatchPath = list[Matchday]
