@@ -1,5 +1,6 @@
 from venues import haversine_distance
-from data_classes import Match, Gameday
+from data_classes import Match, Gameday, MatchGraph
+from .utils import calc_incoming_degrees
 
 
 class TravelGraph:
@@ -8,11 +9,11 @@ class TravelGraph:
     graph: list[dict[int, int]]
 
     def __init__(self, matches: list[Match], max_dist: int, max_days: int):
-        self.matches = sorted(matches, key=lambda m: m.date)
-        self.total_days = max_days
-        self.graph = self._init_graph(max_dist)
+        self.matches: list[Match] = sorted(matches, key=lambda m: m.date)
+        self.total_days: int = max_days
+        self.graph: MatchGraph = self._init_graph(max_dist)
 
-    def _init_graph(self, max_dist: int) -> list[dict[int, int]]:
+    def _init_graph(self, max_dist: int) -> MatchGraph:
         n = len(self.matches)
         return [
             {
@@ -30,12 +31,9 @@ class TravelGraph:
 
     def find_paths(self, min_games: int) -> str:
         paths: list[list[Gameday]] = []
-        incoming_degrees = [0 for _ in range(len(self.matches))]
-        for neighbors_dict in self.graph:
-            for neighbour in neighbors_dict.keys():
-                incoming_degrees[neighbour] += 1
-
+        incoming_degrees = calc_incoming_degrees(self.graph)
         root_matches = [i for i in range(len(self.matches)) if incoming_degrees[i] == 0]
+
         for match_index in root_matches:
             self.find_path_with_candidate(
                 [Gameday(self.matches[match_index].date, set([match_index]))],
