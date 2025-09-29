@@ -1,5 +1,10 @@
 from data_classes import Match, MatchGraph
-from .utils import calc_incoming_degrees, days_between, dist_between
+from .utils import (
+    calc_incoming_degrees,
+    days_between,
+    dist_between,
+    remove_subsequences,
+)
 
 
 class TravelGraph:
@@ -34,6 +39,7 @@ class TravelGraph:
             self.find_path_with_candidate(
                 [match_index], min_games, self.total_days - 1, paths, set()
             )
+        paths = remove_subsequences(paths)
         match_paths = [[self.matches[m] for m in path] for path in paths]
 
         return sorted(match_paths, key=lambda path: path[0].date)
