@@ -1,6 +1,5 @@
-from venues import haversine_distance
 from data_classes import Match, MatchGraph
-from .utils import calc_incoming_degrees
+from .utils import calc_incoming_degrees, days_between, dist_between
 
 
 class TravelGraph:
@@ -19,12 +18,9 @@ class TravelGraph:
             {
                 j: days
                 for j in range(i + 1, n)
-                if (days := (self.matches[j].date.date() - match.date.date()).days)
-                and (days < self.total_days)
-                and (
-                    haversine_distance(match.location, self.matches[j].location)
-                    < max_dist
-                )
+                if (days := days_between(match, self.matches[j]))
+                and (0 < days < self.total_days)
+                and (dist_between(match, self.matches[j]) < max_dist)
             }
             for i, match in enumerate(self.matches)
         ]
