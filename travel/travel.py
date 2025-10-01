@@ -74,8 +74,10 @@ class TravelGraph:
                 ):
                     found_better = True
             else:
+                a, b = candidate[:2]
+                gap = days_between(self.matches[a], self.matches[b])
                 self.find_path_with_candidate(
-                    (candidate[1],), min_games, self.total_days - 1, output, visited
+                    candidate[1:], min_games, days_left + gap, output, visited
                 )
         if success and not found_better:
             output.add(tuple(candidate))
