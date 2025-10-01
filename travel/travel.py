@@ -6,6 +6,8 @@ from .utils import (
     remove_subsequences,
 )
 
+Candidate = tuple[int, ...]
+
 
 class TravelGraph:
     total_days = int
@@ -31,13 +33,14 @@ class TravelGraph:
         ]
 
     def find_paths(self, min_games: int) -> list[list[Match]]:
-        paths: set[tuple[int]] = set()
+        paths: set[Candidate] = set()
+        visited: set[Candidate] = set()
         incoming_degrees = calc_incoming_degrees(self.graph)
         root_matches = [i for i in range(len(self.matches)) if incoming_degrees[i] == 0]
 
         for match_index in root_matches:
             self.find_path_with_candidate(
-                [match_index], min_games, self.total_days - 1, paths, set()
+                (match_index,), min_games, self.total_days - 1, paths, visited
             )
         paths = remove_subsequences(paths)
         match_paths = [[self.matches[m] for m in path] for path in paths]
@@ -46,40 +49,37 @@ class TravelGraph:
 
     def find_path_with_candidate(
         self,
-        candidate: list[int],
+        candidate: Candidate,
         min_games: int,
         days_left: int,
-        output: set[tuple[int]],
-        visited: set[int],
+        output: set[Candidate],
+        visited: set[Candidate],
     ) -> bool:
         if not candidate:
             return False
-        last_match = candidate[-1]
-        if len(candidate) == 1 and last_match in visited:
+        if candidate in visited:
             return False
+        last_match = candidate[-1]
         success = len(candidate) >= min_games
         found_better = False
 
         for next_match, days in self.graph[last_match].items():
             if days <= days_left:
-                found_better = (
-                    self.find_path_with_candidate(
-                        candidate + [next_match],
-                        min_games,
-                        days_left - days,
-                        output,
-                        visited,
-                    )
-                    or found_better
-                )
+                if self.find_path_with_candidate(
+                    candidate + (next_match,),
+                    min_games,
+                    days_left - days,
+                    output,
+                    visited,
+                ):
+                    found_better = True
             else:
                 self.find_path_with_candidate(
-                    [candidate[1]], min_games, self.total_days - 1, output, visited
+                    (candidate[1],), min_games, self.total_days - 1, output, visited
                 )
         if success and not found_better:
             output.add(tuple(candidate))
-        if len(candidate) == 1:
-            visited.add(last_match)
+        visited.add(candidate)
         return success or found_better
 
     def format_paths(self, schedule_options: list[list[Match]]) -> str:
