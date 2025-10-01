@@ -63,20 +63,16 @@ class TravelGraph:
         success = len(candidate) >= min_games
         found_better = False
 
-        print(candidate)
-
         for next_match, days in self.graph[last_match].items():
             if days <= days_left:
-                found_better = (
-                    self.find_path_with_candidate(
-                        candidate + (next_match,),
-                        min_games,
-                        days_left - days,
-                        output,
-                        visited,
-                    )
-                    or found_better
-                )
+                if self.find_path_with_candidate(
+                    candidate + (next_match,),
+                    min_games,
+                    days_left - days,
+                    output,
+                    visited,
+                ):
+                    found_better = True
             else:
                 self.find_path_with_candidate(
                     (candidate[1],), min_games, self.total_days - 1, output, visited
