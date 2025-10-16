@@ -35,53 +35,42 @@ class TravelGraph:
     def find_paths(self, min_games: int) -> list[list[Match]]:
         paths: set[Candidate] = set()
         visited: set[Candidate] = set()
+
+        def dfs(candidate: Candidate, days_left: int) -> bool:
+            if not candidate or candidate in visited:
+                return False
+
+            last_match = candidate[-1]
+            success = len(candidate) >= min_games
+            found_extension = False
+
+            for next_match, days in self.graph[last_match].items():
+                if days <= days_left:
+                    new_candidate = candidate + (next_match,)
+                    if dfs(new_candidate, days_left - days):
+                        found_extension = True
+                else:
+                    assert len(candidate) > 1
+                    sub_candidate = candidate[1:]
+                    if sub_candidate in visited:
+                        continue
+                    gap = self._days_between(candidate[0], candidate[1])
+                    dfs(sub_candidate, days_left + gap)
+
+            if success and not found_extension:
+                paths.add(tuple(candidate))
+            visited.add(candidate)
+            return success or found_extension
+
         incoming_degrees = calc_incoming_degrees(self.graph)
         root_matches = [i for i in range(len(self.matches)) if incoming_degrees[i] == 0]
 
         for match_index in root_matches:
-            self.find_path_with_candidate(
-                (match_index,), min_games, self.total_days - 1, paths, visited
-            )
+            dfs((match_index,), self.total_days - 1)
+
         paths = remove_subsequences(paths)
         match_paths = [[self.matches[m] for m in path] for path in paths]
-
         return sorted(match_paths, key=lambda path: path[0].date)
-
-    def find_path_with_candidate(
-        self,
-        candidate: Candidate,
-        min_games: int,
-        days_left: int,
-        paths: set[Candidate],
-        visited: set[Candidate],
-    ) -> bool:
-        if not candidate or candidate in visited:
-            return False
-
-        last_match = candidate[-1]
-        success = len(candidate) >= min_games
-        found_extension = False
-
-        for next_match, days in self.graph[last_match].items():
-            if days <= days_left:
-                new_candidate = candidate + (next_match,)
-                if self.find_path_with_candidate(
-                    new_candidate, min_games, days_left - days, paths, visited
-                ):
-                    found_extension = True
-            else:
-                assert len(candidate) > 1
-                sub_candidate = candidate[1:]
-                if sub_candidate in visited:
-                    continue
-                gap = self._days_between(candidate[0], candidate[1])
-                self.find_path_with_candidate(
-                    sub_candidate, min_games, days_left + gap, paths, visited
-                )
-        if success and not found_extension:
-            paths.add(tuple(candidate))
-        visited.add(candidate)
-        return success or found_extension
 
     def format_paths(self, schedule_options: list[list[Match]]) -> str:
         lines = []

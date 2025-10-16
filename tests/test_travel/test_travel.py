@@ -27,16 +27,6 @@ def test_travel_graph__init() -> None:
     assert travel_graph.graph == [{1: 2}, {3: 2}, {}, {}]
 
 
-def test_find_path_with_candidate__sanity() -> None:
-    travel_graph = travel.TravelGraph(MATCHES_EXAMPLE, max_dist=500, max_days=3)
-
-    output = []
-    travel_graph.find_path_with_candidate(
-        candidate=[1], min_games=2, days_left=3, output=output
-    )
-    assert output == [[MATCHES_EXAMPLE[1], MATCHES_EXAMPLE[0]]]
-
-
 def test_find_paths__sanity() -> None:
     matches = MATCHES_EXAMPLE
     travel_graph = travel.TravelGraph(matches, max_dist=500, max_days=3)
