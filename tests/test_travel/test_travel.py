@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from travel import travel
 from data_classes import Location, Match
@@ -8,6 +8,8 @@ CRAVEN_COTTAGE = Location(51.4749218, -0.2217448)
 STAMFORD_BRIDGE = Location(51.4816869, -0.1910336)
 TOTTENHAM_STADIUM = Location(51.604157, -0.0662604)
 
+DEFAULT_LOCATION = STAMFORD_BRIDGE
+DEFAULT_DATE = datetime(2025, 9, 1)
 
 MATCHES_EXAMPLE = [
     Match("G", "H", datetime(2025, 9, 5), Location(48.2188, 11.6236)),
@@ -47,14 +49,23 @@ def test_find_paths__sanity() -> None:
 
 def test_find_paths__remove_subsequences() -> None:
     matches = [
-        Match("A1", "A2", datetime(2022, 1, 1), TOTTENHAM_STADIUM),
-        Match("B1", "B2", datetime(2022, 1, 3), CRAVEN_COTTAGE),
-        Match("C1", "C2", datetime(2022, 1, 4), STAMFORD_BRIDGE),
-        Match("D1", "D2", datetime(2022, 1, 5), STAMFORD_BRIDGE),
-        Match("E1", "E2", datetime(2022, 1, 6), STAMFORD_BRIDGE),
+        _match(index=1, days=0, loc=TOTTENHAM_STADIUM),
+        _match(index=2, days=2, loc=CRAVEN_COTTAGE),
+        _match(index=3, days=3, loc=STAMFORD_BRIDGE),
+        _match(index=4, days=4, loc=STAMFORD_BRIDGE),
+        _match(index=5, days=5, loc=STAMFORD_BRIDGE),
     ]
     expected_output = [matches[1:]]
 
     travel_graph = travel.TravelGraph(matches, max_dist=10, max_days=5)
     paths = travel_graph.find_paths(min_games=3)
     assert paths == expected_output
+
+
+def _match(index: int, days: int, loc: Location = DEFAULT_LOCATION) -> Match:
+    return Match(
+        home_team=f"A{index}",
+        away_team=f"B{index}",
+        date=DEFAULT_DATE + timedelta(days=days),
+        location=loc,
+    )
