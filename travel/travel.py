@@ -52,37 +52,36 @@ class TravelGraph:
         candidate: Candidate,
         min_games: int,
         days_left: int,
-        output: set[Candidate],
+        paths: set[Candidate],
         visited: set[Candidate],
     ) -> bool:
-        if not candidate:
+        if not candidate or candidate in visited:
             return False
-        if candidate in visited:
-            return False
+
         last_match = candidate[-1]
         success = len(candidate) >= min_games
-        found_better = False
+        found_extension = False
 
         for next_match, days in self.graph[last_match].items():
             if days <= days_left:
+                new_candidate = candidate + (next_match,)
                 if self.find_path_with_candidate(
-                    candidate + (next_match,),
-                    min_games,
-                    days_left - days,
-                    output,
-                    visited,
+                    new_candidate, min_games, days_left - days, paths, visited
                 ):
-                    found_better = True
+                    found_extension = True
             else:
-                a, b = candidate[:2]
-                gap = days_between(self.matches[a], self.matches[b])
+                assert len(candidate) > 1
+                sub_candidate = candidate[1:]
+                if sub_candidate in visited:
+                    continue
+                gap = self._days_between(candidate[0], candidate[1])
                 self.find_path_with_candidate(
-                    candidate[1:], min_games, days_left + gap, output, visited
+                    sub_candidate, min_games, days_left + gap, paths, visited
                 )
-        if success and not found_better:
-            output.add(tuple(candidate))
+        if success and not found_extension:
+            paths.add(tuple(candidate))
         visited.add(candidate)
-        return success or found_better
+        return success or found_extension
 
     def format_paths(self, schedule_options: list[list[Match]]) -> str:
         lines = []
@@ -92,3 +91,6 @@ class TravelGraph:
                 # matches_str = " | ".join(map(str, gd.matches))
                 lines.append(f"  {gd.date.strftime('%Y-%m-%d')}: [{gd}]")
         return "\n".join(lines)
+
+    def _days_between(self, i: int, j: int) -> int:
+        return days_between(self.matches[i], self.matches[j])
