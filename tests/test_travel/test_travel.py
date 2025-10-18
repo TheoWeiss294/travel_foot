@@ -47,6 +47,20 @@ def test_find_paths__sanity() -> None:
     assert paths == [[matches[2], matches[1], matches[0]]]
 
 
+def test_find_paths__basic():
+    matches = [
+        _match(index=0, days=0),
+        _match(index=1, days=2),
+        _match(index=2, days=4),
+        _match(index=3, days=10),
+    ]
+    expected_output = [matches[:3]]
+    travel_graph = travel.TravelGraph(matches, max_dist=10, max_days=5)
+    paths = travel_graph.find_paths(2)
+
+    assert paths == expected_output
+
+
 def test_find_paths__remove_subsequences() -> None:
     matches = [
         _match(index=1, days=0, loc=TOTTENHAM_STADIUM),
