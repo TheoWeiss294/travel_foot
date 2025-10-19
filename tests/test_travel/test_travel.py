@@ -76,10 +76,32 @@ def test_find_paths__remove_subsequences() -> None:
     assert paths == expected_output
 
 
-def _match(index: int, days: int, loc: Location = DEFAULT_LOCATION) -> Match:
+def test_find_paths__testcase_1() -> None:
+    matches = [
+        _match(index=0, days=0, loc=TOTTENHAM_STADIUM),
+        _match(index=1, days=0, hours=1, loc=STAMFORD_BRIDGE),
+        _match(index=2, days=1, loc=STAMFORD_BRIDGE),
+        _match(index=3, days=2, loc=STAMFORD_BRIDGE),
+        _match(index=4, days=2, hours=1, loc=TOTTENHAM_STADIUM),
+        _match(index=5, days=3, loc=TOTTENHAM_STADIUM),
+    ]
+    expected = [
+        [matches[0], matches[2], matches[3], matches[5]],
+        [matches[0], matches[2], matches[4], matches[5]],
+        [matches[1], matches[2], matches[3], matches[5]],
+        [matches[1], matches[2], matches[4], matches[5]],
+    ]
+    travel_graph = travel.TravelGraph(matches, max_dist=50, max_days=5)
+    paths = travel_graph.find_paths(min_games=3)
+    assert paths == expected
+
+
+def _match(
+    index: int, days: int, hours: int = 0, loc: Location = DEFAULT_LOCATION
+) -> Match:
     return Match(
         home_team=f"A{index}",
         away_team=f"B{index}",
-        date=DEFAULT_DATE + timedelta(days=days),
+        date=DEFAULT_DATE + timedelta(days=days, hours=hours),
         location=loc,
     )
