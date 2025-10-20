@@ -1,5 +1,6 @@
 import json
 import time
+import logging
 import math
 from pathlib import Path
 
@@ -11,6 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CACHE_FILE = PROJECT_ROOT / "venues" / "venues.json"
 
 
+logger = logging.getLogger(__name__)
 _cache: dict[str, tuple[float, float]] = {}
 
 if CACHE_FILE.exists():
@@ -28,6 +30,7 @@ def save_cache() -> None:
 
 
 def geocode_with_cache(query: str) -> Location | None:
+    # TODO: consider unicoded query
     if query in _cache:
         lat, lon = _cache[query]
         return Location(lat, lon)
@@ -37,6 +40,7 @@ def geocode_with_cache(query: str) -> Location | None:
     data = open_street_map.venue_location(query)
 
     if not data:
+        logger.error("No geocoding data found for query: %s", query)
         return None
 
     lat, lon = (float(data[0]["lat"]), float(data[0]["lon"]))
