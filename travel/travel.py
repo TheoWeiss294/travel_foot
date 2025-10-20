@@ -10,8 +10,8 @@ Candidate = tuple[int, ...]
 
 
 class TravelGraph:
-    total_days = int
-    matches = list[Match]
+    matches: list[Match]
+    total_days: int
     graph: list[dict[int, int]]
 
     def __init__(self, matches: list[Match], max_dist: int, max_days: int):
