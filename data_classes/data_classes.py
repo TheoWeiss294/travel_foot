@@ -25,5 +25,8 @@ class Matchday(NamedTuple):
     date: datetime
     matches: set[Match]
 
+    def __repr__(self) -> str:
+        return f"{self.date}: " + " | ".join(self.matches)
+
 
 MatchPath = list[Matchday]
