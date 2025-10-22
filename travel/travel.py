@@ -12,16 +12,16 @@ Candidate = tuple[int, ...]
 class TravelGraph:
     matches: list[Match]
     total_days: int
-    graph: list[dict[int, int]]
+    graph: MatchGraph
 
     def __init__(self, matches: list[Match], max_dist: int, max_days: int):
         self.matches: list[Match] = sorted(matches, key=lambda m: m.date)
         self.total_days: int = max_days
-        self.graph: MatchGraph = self._init_graph(max_dist)
+        self._init_graph(max_dist)
 
     def _init_graph(self, max_dist: int) -> MatchGraph:
         n = len(self.matches)
-        return [
+        self.graph = [
             {
                 j: days
                 for j in range(i + 1, n)
