@@ -19,7 +19,7 @@ class TravelGraph:
         self.total_days: int = max_days
         self._init_graph(max_dist)
 
-    def _init_graph(self, max_dist: int) -> MatchGraph:
+    def _init_graph(self, max_dist: int) -> None:
         n = len(self.matches)
         self.graph = [
             {
