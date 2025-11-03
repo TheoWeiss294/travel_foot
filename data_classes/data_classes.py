@@ -2,8 +2,15 @@ from typing import NamedTuple
 from datetime import datetime
 
 
-WeightedNeighbourDict = dict[int, int]
-MatchGraph = list[WeightedNeighbourDict]
+WeightedAdjacencyDict = dict[int, int]
+
+
+class NodeAdjacency(NamedTuple):
+    incoming: WeightedAdjacencyDict
+    outgoing: WeightedAdjacencyDict
+
+
+MatchGraph = list[NodeAdjacency]
 
 
 class Location(NamedTuple):
