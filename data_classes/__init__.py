@@ -5,5 +5,4 @@ from .data_classes import (
     MatchGraph,
     MatchPath,
     NodeAdjacency,
-    WeightedAdjacencyDict,
 )

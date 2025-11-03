@@ -6,11 +6,7 @@ from data_classes import Match, MatchGraph
 
 
 def calc_incoming_degrees(graph: MatchGraph) -> list[int]:
-    incoming_degrees = [0 for _ in range(len(graph))]
-    for node_adjacency in graph:
-        for neighbour in node_adjacency.outgoing.keys():
-            incoming_degrees[neighbour] += 1
-    return incoming_degrees
+    return [len(node.incoming) for node in graph]
 
 
 def days_between(m1: Match, m2: Match) -> int:
