@@ -1,10 +1,5 @@
 from data_classes import Match, MatchGraph, NodeAdjacency
-from .utils import (
-    calc_incoming_degrees,
-    days_between,
-    dist_between,
-    remove_subsequences,
-)
+from .utils import days_between, dist_between, remove_subsequences
 
 Candidate = tuple[int, ...]
 
@@ -71,9 +66,7 @@ class TravelGraph:
             visited.add(candidate)
             return success or found_extension
 
-        incoming_degrees = calc_incoming_degrees(self.graph)
-        root_matches = [i for i in range(len(self.matches)) if incoming_degrees[i] == 0]
-
+        root_matches = [i for i, node in enumerate(self.graph) if not node.incoming]
         for match_index in root_matches:
             dfs((match_index,), self.total_days - 1)
 

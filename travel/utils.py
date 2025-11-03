@@ -2,11 +2,7 @@ from typing import Iterable
 from datetime import datetime
 
 from venues import haversine_distance
-from data_classes import Match, MatchGraph
-
-
-def calc_incoming_degrees(graph: MatchGraph) -> list[int]:
-    return [len(node.incoming) for node in graph]
+from data_classes import Match
 
 
 def days_between(m1: Match, m2: Match) -> int:
