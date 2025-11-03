@@ -1,4 +1,4 @@
-from data_classes import Match, MatchGraph
+from data_classes import Match, MatchGraph, NodeAdjacency
 from .utils import (
     calc_incoming_degrees,
     days_between,
@@ -21,16 +21,25 @@ class TravelGraph:
 
     def _init_graph(self, max_dist: int) -> None:
         n = len(self.matches)
-        self.graph = [
-            {
-                j: days
-                for j in range(i + 1, n)
-                if (days := days_between(match, self.matches[j]))
-                and (0 < days < self.total_days)
-                and (dist_between(match, self.matches[j]) < max_dist)
-            }
-            for i, match in enumerate(self.matches)
-        ]
+        graph: list[NodeAdjacency] = [NodeAdjacency({}, {}) for _ in range(n)]
+
+        for i, match_i in enumerate(self.matches):
+            for j in range(i + 1, n):
+                match_j = self.matches[j]
+                days = days_between(match_i, match_j)
+
+                if days >= self.total_days:
+                    break
+                if days == 0:
+                    continue
+                # TODO: memoization
+                if dist_between(match_i, match_j) > max_dist:
+                    continue
+
+                graph[i].outgoing[j] = days
+                graph[j].incoming[i] = days
+
+        self.graph = graph
 
     def find_paths(self, min_games: int) -> list[list[Match]]:
         paths: set[Candidate] = set()
@@ -44,7 +53,7 @@ class TravelGraph:
             success = len(candidate) >= min_games
             found_extension = False
 
-            for next_match, days in self.graph[last_match].items():
+            for next_match, days in self.graph[last_match].outgoing.items():
                 if days <= days_left:
                     new_candidate = candidate + (next_match,)
                     if dfs(new_candidate, days_left - days):

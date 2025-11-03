@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from travel import travel
-from data_classes import Location, Match
+from data_classes import Location, Match, MatchGraph, NodeAdjacency
 
 
 CRAVEN_COTTAGE = Location(51.4749218, -0.2217448)
@@ -22,11 +22,19 @@ MATCHES_EXAMPLE = [
 def test_travel_graph__init() -> None:
     matches = MATCHES_EXAMPLE
     travel_graph = travel.TravelGraph(matches, max_dist=500, max_days=3)
+    expected = MatchGraph(
+        [
+            NodeAdjacency({}, {1: 2}),
+            NodeAdjacency({0: 2}, {3: 2}),
+            NodeAdjacency({}, {}),
+            NodeAdjacency({1: 2}, {}),
+        ]
+    )
 
     sorted_matches = [matches[2], matches[1], matches[3], matches[0]]
     assert travel_graph.matches == sorted_matches
     assert travel_graph.total_days == 3
-    assert travel_graph.graph == [{1: 2}, {3: 2}, {}, {}]
+    assert travel_graph.graph == expected
 
 
 def test_find_paths__sanity() -> None:
