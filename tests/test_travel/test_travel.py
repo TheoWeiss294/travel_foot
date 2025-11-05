@@ -60,10 +60,11 @@ def test_travel_graph__equivalent_nodes() -> None:
     travel_graph = travel.TravelGraph(matches, max_dist=12, max_days=4)
     assert travel_graph.graph == expected_graph
 
+    # pylint: disable=protected-access
     equivalent_tuples = [
         (i, j)
         for i, j in combinations(range(len(matches)), 2)
-        if travel_graph._equivalent_nodes(i, j)  # pylint: disable=protected-access
+        if travel_graph._equivalence_key(i) == travel_graph._equivalence_key(j)
     ]
     assert equivalent_tuples == [(1, 2)]
 

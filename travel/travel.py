@@ -44,14 +44,8 @@ class TravelGraph:
 
     def group_equivalent_nodes(self) -> list[list[int]]:
         groups: dict[EquivalenceKey, list[int]] = defaultdict(list)
-
-        for i, match in enumerate(self.matches):
-            key = (
-                match.date.date(),
-                tuple(self.graph[i].incoming.items()),
-                tuple(self.graph[i].outgoing.items()),
-            )
-            groups[key].append(i)
+        for i in range(len(self.matches)):
+            groups[self._equivalence_key(i)].append(i)
         return list(groups.values())
 
     def find_paths(self, min_games: int) -> list[list[Match]]:
@@ -104,9 +98,9 @@ class TravelGraph:
     def _days_between(self, i: int, j: int) -> int:
         return days_between(self.matches[i], self.matches[j])
 
-    def _equivalent_nodes(self, i: int, j: int) -> bool:
+    def _equivalence_key(self, i: int) -> EquivalenceKey:
         return (
-            self._days_between(i, j) == 0
-            and self.graph[i].incoming == self.graph[j].incoming
-            and self.graph[i].outgoing == self.graph[j].outgoing
+            self.matches[i].date.date(),
+            tuple(self.graph[i].incoming.items()),
+            tuple(self.graph[i].outgoing.items()),
         )
