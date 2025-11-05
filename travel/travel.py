@@ -85,3 +85,10 @@ class TravelGraph:
 
     def _days_between(self, i: int, j: int) -> int:
         return days_between(self.matches[i], self.matches[j])
+
+    def _equivalent_nodes(self, i: int, j: int) -> bool:
+        return (
+            self._days_between(i, j) == 0
+            and self.graph[i].incoming == self.graph[j].incoming
+            and self.graph[i].outgoing == self.graph[j].outgoing
+        )

@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+from itertools import combinations
 
 from travel import travel
 from data_classes import Location, Match, MatchGraph, NodeAdjacency
 
 
 CRAVEN_COTTAGE = Location(51.4749218, -0.2217448)
+EMIRATES_STADIUM = Location(51.5550403, -0.1083997)
 STAMFORD_BRIDGE = Location(51.4816869, -0.1910336)
 TOTTENHAM_STADIUM = Location(51.604157, -0.0662604)
 
@@ -35,6 +37,35 @@ def test_travel_graph__init() -> None:
     assert travel_graph.matches == sorted_matches
     assert travel_graph.total_days == 3
     assert travel_graph.graph == expected
+
+
+def test_travel_graph__parallel_nodes() -> None:
+    matches = [
+        _match(index=1, days=0, loc=EMIRATES_STADIUM),
+        _match(index=2, days=2, loc=CRAVEN_COTTAGE),
+        _match(index=3, days=2, loc=STAMFORD_BRIDGE, hours=1),
+        _match(index=4, days=3, loc=TOTTENHAM_STADIUM),
+        _match(index=5, days=4, loc=EMIRATES_STADIUM),
+    ]
+    expected_graph = MatchGraph(
+        [
+            NodeAdjacency({}, {1: 2, 2: 2, 3: 3}),
+            NodeAdjacency({0: 2}, {4: 2}),
+            NodeAdjacency({0: 2}, {4: 2}),
+            NodeAdjacency({0: 3}, {4: 1}),
+            NodeAdjacency({1: 2, 2: 2, 3: 1}, {}),
+        ]
+    )
+
+    travel_graph = travel.TravelGraph(matches, max_dist=12, max_days=4)
+    assert travel_graph.graph == expected_graph
+
+    parallel = [
+        (i, j)
+        for i, j in combinations(range(len(matches)), 2)
+        if travel_graph._equivalent_nodes(i, j)  # pylint: disable=protected-access
+    ]
+    assert parallel == [(1, 2)]
 
 
 def test_find_paths__sanity() -> None:
