@@ -1,7 +1,13 @@
+from typing import TypeAlias
+from collections import defaultdict
+from datetime import date
+
 from data_classes import Match, MatchGraph, NodeAdjacency
 from .utils import days_between, dist_between, remove_subsequences
 
-Candidate = tuple[int, ...]
+AdjacencyTuple: TypeAlias = tuple[tuple[int, int], ...]
+EquivalenceKey: TypeAlias = tuple[date, AdjacencyTuple, AdjacencyTuple]
+Candidate: TypeAlias = tuple[int, ...]
 
 
 class TravelGraph:
@@ -35,6 +41,18 @@ class TravelGraph:
                 graph[j].incoming[i] = days
 
         self.graph = graph
+
+    def group_equivalent_nodes(self) -> list[list[int]]:
+        groups: dict[EquivalenceKey, list[int]] = defaultdict(list)
+
+        for i, match in enumerate(self.matches):
+            key = (
+                match.date.date(),
+                tuple(self.graph[i].incoming.items()),
+                tuple(self.graph[i].outgoing.items()),
+            )
+            groups[key].append(i)
+        return list(groups.values())
 
     def find_paths(self, min_games: int) -> list[list[Match]]:
         paths: set[Candidate] = set()
