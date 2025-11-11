@@ -79,7 +79,7 @@ def test_travel_graph__equivalent_node__sanity() -> None:
         _match(index=5, days=7, loc=CRAVEN_COTTAGE),
         _match(index=6, days=7, loc=STAMFORD_BRIDGE, hours=1),
         _match(index=7, days=7, loc=TOTTENHAM_STADIUM, hours=2),
-        _match(index=8, days=17, loc=TOTTENHAM_STADIUM, hours=2),
+        _match(index=8, days=17, loc=TOTTENHAM_STADIUM),
         _match(index=9, days=17, loc=EMIRATES_STADIUM, hours=2),
     ]
     travel_graph = travel.TravelGraph(matches, max_dist=12, max_days=4)
