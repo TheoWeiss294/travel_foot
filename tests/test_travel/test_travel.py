@@ -83,7 +83,7 @@ def test_travel_graph__equivalent_node__sanity() -> None:
         _match(index=9, days=17, loc=EMIRATES_STADIUM, hours=2),
     ]
     travel_graph = travel.TravelGraph(matches, max_dist=12, max_days=4)
-    equiv_groups = travel_graph.group_equivalent_nodes()
+    equiv_groups = list(travel_graph.equiv_dict.values())
     assert equiv_groups == [[0], [1, 2], [3], [4], [5, 6, 7], [8], [9]]
 
 
@@ -152,6 +152,19 @@ def test_find_paths__testcase_1() -> None:
     travel_graph = travel.TravelGraph(matches, max_dist=50, max_days=5)
     paths = travel_graph.find_paths(min_games=3)
     assert paths == expected
+
+
+def test__sparse_graph__sanity() -> None:
+    matches = [
+        _match(index=0, days=0, loc=EMIRATES_STADIUM),
+        _match(index=1, days=2, loc=CRAVEN_COTTAGE),
+        _match(index=2, days=2, loc=STAMFORD_BRIDGE, hours=1),
+        _match(index=3, days=3, loc=TOTTENHAM_STADIUM),
+        _match(index=4, days=4, loc=EMIRATES_STADIUM),
+    ]
+    travel_graph = travel.TravelGraph(matches, max_dist=12, max_days=4)
+    sparse_graph = travel_graph._sparse_graph()  # pylint: disable=protected-access
+    assert sparse_graph == {0: {1: 2, 3: 3}, 1: {4: 2}, 3: {4: 1}, 4: {}}
 
 
 def _match(
