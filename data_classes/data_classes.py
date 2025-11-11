@@ -2,6 +2,8 @@ from typing import NamedTuple, TypeAlias
 from datetime import datetime
 
 
+Candidate: TypeAlias = tuple[int, ...]
+EquivalenceDict: TypeAlias = dict[int, list[int]]
 WeightedAdjacencyDict: TypeAlias = dict[int, int]
 
 
