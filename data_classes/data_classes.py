@@ -1,8 +1,8 @@
-from typing import NamedTuple
+from typing import NamedTuple, TypeAlias
 from datetime import datetime
 
 
-WeightedAdjacencyDict = dict[int, int]
+WeightedAdjacencyDict: TypeAlias = dict[int, int]
 
 
 class NodeAdjacency(NamedTuple):
@@ -10,7 +10,7 @@ class NodeAdjacency(NamedTuple):
     outgoing: WeightedAdjacencyDict
 
 
-MatchGraph = list[NodeAdjacency]
+MatchGraph: TypeAlias = list[NodeAdjacency]
 
 
 class Location(NamedTuple):
@@ -36,4 +36,4 @@ class Matchday(NamedTuple):
         return f"{self.date}: " + " | ".join(self.matches)
 
 
-MatchPath = list[Matchday]
+MatchPath: TypeAlias = list[Matchday]
