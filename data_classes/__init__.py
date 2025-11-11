@@ -5,4 +5,7 @@ from .data_classes import (
     MatchGraph,
     MatchPath,
     NodeAdjacency,
+    EquivalenceDict,
+    Candidate,
+    WeightedAdjacencyDict,
 )

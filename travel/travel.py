@@ -2,23 +2,31 @@ from typing import TypeAlias
 from collections import defaultdict
 from datetime import date
 
-from data_classes import Match, MatchGraph, NodeAdjacency
-from .utils import days_between, dist_between, remove_subsequences
+from data_classes import (
+    Match,
+    MatchGraph,
+    NodeAdjacency,
+    Candidate,
+    EquivalenceDict,
+    WeightedAdjacencyDict,
+)
+from .utils import days_between, dist_between, remove_subsequences, all_equivalent_paths
 
 AdjacencyTuple: TypeAlias = tuple[tuple[int, int], ...]
 EquivalenceKey: TypeAlias = tuple[date, int, AdjacencyTuple, AdjacencyTuple]
-Candidate: TypeAlias = tuple[int, ...]
 
 
 class TravelGraph:
     matches: list[Match]
     total_days: int
     graph: MatchGraph
+    equiv_dict: EquivalenceDict
 
     def __init__(self, matches: list[Match], max_dist: int, max_days: int):
         self.matches: list[Match] = sorted(matches, key=lambda m: m.date)
         self.total_days: int = max_days
         self._init_graph(max_dist)
+        self.equiv_dict = {min(group): group for group in self.group_equivalent_nodes()}
 
     def _init_graph(self, max_dist: int) -> None:
         n = len(self.matches)
@@ -51,6 +59,7 @@ class TravelGraph:
     def find_paths(self, min_games: int) -> list[list[Match]]:
         paths: set[Candidate] = set()
         visited: set[Candidate] = set()
+        sparse_graph = self._sparse_graph()
 
         def dfs(candidate: Candidate, days_left: int) -> bool:
             if not candidate or candidate in visited:
@@ -60,7 +69,7 @@ class TravelGraph:
             success = len(candidate) >= min_games
             found_extension = False
 
-            for next_match, days in self.graph[last_match].outgoing.items():
+            for next_match, days in sparse_graph[last_match].items():
                 if days <= days_left:
                     new_candidate = candidate + (next_match,)
                     if dfs(new_candidate, days_left - days):
@@ -78,11 +87,12 @@ class TravelGraph:
             visited.add(candidate)
             return success or found_extension
 
-        root_matches = [i for i, node in enumerate(self.graph) if not node.incoming]
+        root_matches = [x for x in sparse_graph.keys() if not self.graph[x].incoming]
         for match_index in root_matches:
             dfs((match_index,), self.total_days - 1)
 
         paths = remove_subsequences(paths)
+        paths = all_equivalent_paths(paths, self.equiv_dict)
         match_paths = [[self.matches[m] for m in path] for path in paths]
         return sorted(match_paths, key=lambda path: path[0].date)
 
@@ -103,3 +113,13 @@ class TravelGraph:
         outgoing = tuple(self.graph[i].outgoing.items())
         isolated_key = i if not (incoming or outgoing) else -1
         return (self.matches[i].date.date(), isolated_key, incoming, outgoing)
+
+    def _sparse_graph(self) -> dict[int, WeightedAdjacencyDict]:
+        return {
+            node: {
+                neighbour: weight
+                for neighbour, weight in self.graph[node].outgoing.items()
+                if neighbour in self.equiv_dict.keys()
+            }
+            for node in self.equiv_dict.keys()
+        }
