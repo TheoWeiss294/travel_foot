@@ -71,18 +71,20 @@ def test_travel_graph__equivalent_nodes() -> None:
 
 def test_travel_graph__equivalent_node__sanity() -> None:
     matches = [
-        _match(index=1, days=0, loc=EMIRATES_STADIUM),
-        _match(index=2, days=2, loc=CRAVEN_COTTAGE),
-        _match(index=3, days=2, loc=STAMFORD_BRIDGE, hours=1),
-        _match(index=4, days=3, loc=TOTTENHAM_STADIUM),
-        _match(index=5, days=4, loc=EMIRATES_STADIUM),
-        _match(index=6, days=7, loc=CRAVEN_COTTAGE),
-        _match(index=7, days=7, loc=STAMFORD_BRIDGE, hours=1),
-        _match(index=8, days=7, loc=TOTTENHAM_STADIUM, hours=2),
+        _match(index=0, days=0, loc=EMIRATES_STADIUM),
+        _match(index=1, days=2, loc=CRAVEN_COTTAGE),
+        _match(index=2, days=2, loc=STAMFORD_BRIDGE, hours=1),
+        _match(index=3, days=3, loc=TOTTENHAM_STADIUM),
+        _match(index=4, days=4, loc=EMIRATES_STADIUM),
+        _match(index=5, days=7, loc=CRAVEN_COTTAGE),
+        _match(index=6, days=7, loc=STAMFORD_BRIDGE, hours=1),
+        _match(index=7, days=7, loc=TOTTENHAM_STADIUM, hours=2),
+        _match(index=8, days=17, loc=TOTTENHAM_STADIUM),
+        _match(index=9, days=17, loc=EMIRATES_STADIUM, hours=2),
     ]
     travel_graph = travel.TravelGraph(matches, max_dist=12, max_days=4)
     equiv_groups = travel_graph.group_equivalent_nodes()
-    assert equiv_groups == [[0], [1, 2], [3], [4], [5, 6, 7]]
+    assert equiv_groups == [[0], [1, 2], [3], [4], [5, 6, 7], [8], [9]]
 
 
 def test_find_paths__sanity() -> None:

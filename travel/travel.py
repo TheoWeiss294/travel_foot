@@ -6,7 +6,7 @@ from data_classes import Match, MatchGraph, NodeAdjacency
 from .utils import days_between, dist_between, remove_subsequences
 
 AdjacencyTuple: TypeAlias = tuple[tuple[int, int], ...]
-EquivalenceKey: TypeAlias = tuple[date, AdjacencyTuple, AdjacencyTuple]
+EquivalenceKey: TypeAlias = tuple[date, int, AdjacencyTuple, AdjacencyTuple]
 Candidate: TypeAlias = tuple[int, ...]
 
 
@@ -99,8 +99,7 @@ class TravelGraph:
         return days_between(self.matches[i], self.matches[j])
 
     def _equivalence_key(self, i: int) -> EquivalenceKey:
-        return (
-            self.matches[i].date.date(),
-            tuple(self.graph[i].incoming.items()),
-            tuple(self.graph[i].outgoing.items()),
-        )
+        incoming = tuple(self.graph[i].incoming.items())
+        outgoing = tuple(self.graph[i].outgoing.items())
+        isolated_key = i if not (incoming or outgoing) else -1
+        return (self.matches[i].date.date(), isolated_key, incoming, outgoing)
