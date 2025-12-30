@@ -10,7 +10,7 @@ from data_classes import (
     EquivalenceDict,
     WeightedAdjacencyDict,
 )
-from .utils import days_between, dist_between, remove_subsequences, all_equivalent_paths
+from .utils import days_between, dist_between, all_equivalent_paths
 
 AdjacencyTuple: TypeAlias = tuple[tuple[int, int], ...]
 EquivalenceKey: TypeAlias = tuple[date, int, AdjacencyTuple, AdjacencyTuple]
@@ -61,10 +61,16 @@ class TravelGraph:
         visited: set[Candidate] = set()
         sparse_graph = self._sparse_graph()
 
-        def dfs(candidate: Candidate, days_left: int) -> bool:
-            if not candidate or candidate in visited:
+        def dfs(candidate: Candidate, days_left: int, subseq: bool = False) -> bool:
+            if (
+                not candidate
+                or candidate in visited
+                or (candidate[0], candidate[-1]) in visited
+            ):
                 return False
 
+            visited.add(candidate)
+            visited.add((candidate[0], candidate[-1]))
             last_match = candidate[-1]
             success = len(candidate) >= min_games
             found_extension = False
@@ -80,18 +86,16 @@ class TravelGraph:
                     if sub_candidate in visited:
                         continue
                     gap = self._days_between(candidate[0], candidate[1])
-                    dfs(sub_candidate, days_left + gap)
+                    dfs(sub_candidate, days_left + gap, subseq=True)
 
-            if success and not found_extension:
+            if success and not found_extension and not subseq:
                 paths.add(tuple(candidate))
-            visited.add(candidate)
             return success or found_extension
 
         root_matches = [x for x in sparse_graph.keys() if not self.graph[x].incoming]
         for match_index in root_matches:
             dfs((match_index,), self.total_days - 1)
 
-        paths = remove_subsequences(paths)
         paths = all_equivalent_paths(paths, self.equiv_dict)
         match_paths = [[self.matches[m] for m in path] for path in paths]
         return sorted(match_paths, key=lambda path: path[0].date)
