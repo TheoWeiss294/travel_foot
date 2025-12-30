@@ -61,7 +61,7 @@ class TravelGraph:
         visited: set[Candidate] = set()
         sparse_graph = self._sparse_graph()
 
-        def dfs(candidate: Candidate, days_left: int, subseq: bool = False) -> bool:
+        def dfs(candidate: Candidate, days_left: int) -> bool:
             if (
                 not candidate
                 or candidate in visited
@@ -69,8 +69,10 @@ class TravelGraph:
             ):
                 return False
 
-            visited.add(candidate)
-            visited.add((candidate[0], candidate[-1]))
+            if days_left < 0:
+                gap = self._days_between(candidate[0], candidate[1])
+                return dfs(candidate[1:], days_left + gap)
+
             last_match = candidate[-1]
             success = len(candidate) >= min_games
             found_extension = False
@@ -82,14 +84,16 @@ class TravelGraph:
                         found_extension = True
                 else:
                     assert len(candidate) > 1
-                    sub_candidate = candidate[1:]
+                    sub_candidate = candidate[1:] + (next_match,)
                     if sub_candidate in visited:
                         continue
                     gap = self._days_between(candidate[0], candidate[1])
-                    dfs(sub_candidate, days_left + gap, subseq=True)
+                    dfs(sub_candidate, days_left - days + gap)
 
-            if success and not found_extension and not subseq:
+            if success and not found_extension:
                 paths.add(tuple(candidate))
+            visited.add(candidate)
+            visited.add((candidate[0], candidate[-1]))
             return success or found_extension
 
         root_matches = [x for x in sparse_graph.keys() if not self.graph[x].incoming]
