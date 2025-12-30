@@ -62,6 +62,7 @@ class TravelGraph:
         sparse_graph = self._sparse_graph()
 
         def dfs(candidate: Candidate, days_left: int, subseq: bool = False) -> bool:
+            print(candidate)
             if (
                 not candidate
                 or candidate in visited
