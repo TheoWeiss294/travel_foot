@@ -126,8 +126,10 @@ def test_find_paths__remove_subsequences() -> None:
         _match(index=3, days=3, loc=STAMFORD_BRIDGE),
         _match(index=4, days=4, loc=STAMFORD_BRIDGE),
         _match(index=5, days=5, loc=STAMFORD_BRIDGE),
+        _match(index=6, days=7, loc=STAMFORD_BRIDGE),
+        _match(index=7, days=10, loc=STAMFORD_BRIDGE),
     ]
-    expected_output = [matches[1:]]
+    expected_output = [matches[1:5], matches[2:6]]
 
     travel_graph = travel.TravelGraph(matches, max_dist=10, max_days=5)
     paths = travel_graph.find_paths(min_games=3)
