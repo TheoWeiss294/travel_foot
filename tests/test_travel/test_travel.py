@@ -172,6 +172,28 @@ def test_find_paths__testcase_2() -> None:
     assert paths == expected
 
 
+def test_find_paths__testcase_3() -> None:
+    """
+    (A0) -> (A1) -> (A3)
+        \__ (A2) __/
+                \_______ (A4)
+    """
+    matches = [
+        _match(index=0, days=0, loc=STAMFORD_BRIDGE),
+        _match(index=1, days=1, loc=STAMFORD_BRIDGE),
+        _match(index=2, days=1, hours=1, loc=EMIRATES_STADIUM),
+        _match(index=3, days=3, loc=STAMFORD_BRIDGE),
+        _match(index=4, days=4, loc=TOTTENHAM_STADIUM),
+    ]
+    expected = [
+        [matches[0], matches[1], matches[3]],
+        [matches[0], matches[2], matches[3]],
+    ]
+    travel_graph = travel.TravelGraph(matches, max_dist=10, max_days=4)
+    paths = travel_graph.find_paths(min_games=3)
+    assert paths == expected
+
+
 def test__sparse_graph__sanity() -> None:
     matches = [
         _match(index=0, days=0, loc=EMIRATES_STADIUM),
