@@ -175,9 +175,8 @@ def test_find_paths__testcase_2() -> None:
 def test_find_paths__testcase_3() -> None:
     """
     (A0) -> (A1) -> (A3)
-        \__ (A2) __/ 
-                \\
-                 \\_ (A4)
+        \__ (A2) __/
+                \_______ (A4)
     """
     matches = [
         _match(index=0, days=0, loc=STAMFORD_BRIDGE),
